@@ -1,0 +1,33 @@
+GET http://localhost:3000/api/members
+
+###
+
+POST http://localhost:3000/api/members
+//Content-type:데이터 타입을 나타내는 것
+//application/json 바디에 있는 데이터 타입이 json이라는 것
+Content-Type: application/json 
+
+{
+    "id":11,
+    "team":"Engineering",
+    "position":"Android Developer"
+}
+### //구분자
+
+PUT http://localhost:3000/api/members/1
+Content-Type: application/json
+
+{
+    "id":"Alex",
+    "name":"Engineering",
+    "position":"Ios Developer",
+    "emailAddress":"alex@google.com",
+    "phoneNumber":"010-xxxx-xxxx",
+    "admissinDate":"2018/12/10",
+    "birthday": "1994/11/08",
+    "profileImage":"profile1.png"
+}
+
+###
+
+DELETE http://localhost:3000/api/members/3
