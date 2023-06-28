@@ -1,5 +1,14 @@
 const express = require("express");
-let members = require("./members");
+//기존의 직원정보들을 불러오는 함수
+//let members = require("./members");
+
+//const db = require("./models/index");
+//원래는 이렇게 적어도 되는데 어차피 node특성상 특정 디렉토리 이름만 적어도
+//자동으로 index.js파일을 찾게 되어있다.(node에서 모듈이 검색되는 순서 참고)
+
+const db = require("./models");
+
+const { Member } = db;
 
 //express로 만든 객체에는 관습적으로 app이라는 이름을 붙인다.
 const app = express();
@@ -13,7 +22,7 @@ const app = express();
 //간단요약: 일단 미들웨어라는게 서버로는 모든 리퀘스트에 관해 필요한 처리를 해준 함수.
 app.use(express.json());
 
-app.get("/api/members", (req, res) => {
+app.get("/api/members", async (req, res) => {
   //url에 http://localhost:3000/api/members?teams=an
   //라고 입력하면 {"teams":"an"}이라는 객체가 화면에 입력된다.
   const { team } = req.query;
@@ -21,6 +30,10 @@ app.get("/api/members", (req, res) => {
     const teamMembers = members.filter((m) => m.team === team);
     res.send(teamMembers);
   } else {
+    //이 코드는 sequelize에 의해서 결국 SQL문으로 변환되어서
+    //findAll메소드 처럼 모델이 가진 대부분의 메소드들은
+    //비동기함수여서 await과 async를 붙여줘야 한다.
+    const members = await Member.findAll({ where: { team } });
     res.send(members);
   }
   //res.send(members);
@@ -31,9 +44,9 @@ app.get("/api/members", (req, res) => {
 //route는 객 request의 path부분을 보고 알맞은 작업을 수행하는 것을 의미한다.
 //handler는 어떤 작업을 할 것인가에서 작업을 의미
 //:id를 라우터파라미터라고 부른다.
-app.get("/api/members/:id", (req, res) => {
+app.get("/api/members/:id", async (req, res) => {
   const { id } = req.params;
-  const member = members.find((m) => m.id === Number(id));
+  const member = await Member.findOne({ where: { id } });
   if (member) {
     res.send(member);
   } else {
