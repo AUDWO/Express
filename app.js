@@ -54,9 +54,14 @@ app.get("/api/members/:id", async (req, res) => {
   }
 });
 
-app.post("/api/members", (req, res) => {
+app.post("/api/members", async (req, res) => {
   const newMember = req.body;
-  members.push(newMember);
+  //build는 하나의 Member모델 객체를 생성하고 리턴한다.
+  //그리고 build메소드로 탄생한 모델 객체는 앞으로 테이블에서 하나의 row가 될 존재.
+  const member = Member.build(newMember);
+  //Member 모델 객체의 save란 메소드를 호출하면
+  //실제로 테이블에 이 Member 모델 객체의 내용대로 새로운 row가 추가 된다.
+  await member.save();
   res.send(newMember);
 });
 
