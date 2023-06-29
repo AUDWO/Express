@@ -1,4 +1,4 @@
-GET http://localhost:3000/api/members/3
+GET http://localhost:3000/api/members
 
 ###
 
@@ -8,7 +8,6 @@ POST http://localhost:3000/api/members
 Content-Type: application/json 
 
 {
-    "id":11,
     "team":"Engineering",
     "position":"Android Developer"
 }
@@ -17,16 +16,7 @@ Content-Type: application/json
 PUT http://localhost:3000/api/members/1
 Content-Type: application/json
 
-{
-    "id":"Alex",
-    "name":"Engineering",
-    "position":"Ios Developer",
-    "emailAddress":"alex@google.com",
-    "phoneNumber":"010-xxxx-xxxx",
-    "admissinDate":"2018/12/10",
-    "birthday": "1994/11/08",
-    "profileImage":"profile1.png"
-}
+{ "position": "Android Developer"}
 
 ###
 

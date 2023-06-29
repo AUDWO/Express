@@ -23,19 +23,19 @@ const app = express();
 app.use(express.json());
 
 app.get("/api/members", async (req, res) => {
+  const { team } = req.query;
   //url에 http://localhost:3000/api/members?teams=an
   //라고 입력하면 {"teams":"an"}이라는 객체가 화면에 입력된다.
-  const { team } = req.query;
   if (team) {
-    const teamMembers = members.filter((m) => m.team === team);
+    const teamMembers = await Member.findAll({ where: { team } });
     res.send(teamMembers);
   } else {
-    //이 코드는 sequelize에 의해서 결국 SQL문으로 변환되어서
-    //findAll메소드 처럼 모델이 가진 대부분의 메소드들은
-    //비동기함수여서 await과 async를 붙여줘야 한다.
-    const members = await Member.findAll({ where: { team } });
+    const members = await Member.findAll();
     res.send(members);
   }
+  //이 코드는 sequelize에 의해서 결국 SQL문으로 변환되어서
+  //findAll메소드 처럼 모델이 가진 대부분의 메소드들은
+  //비동기함수여서 await과 async를 붙여줘야 한다.
   //res.send(members);
 });
 
@@ -62,22 +62,40 @@ app.post("/api/members", async (req, res) => {
   //Member 모델 객체의 save란 메소드를 호출하면
   //실제로 테이블에 이 Member 모델 객체의 내용대로 새로운 row가 추가 된다.
   await member.save();
+  //Member.build와 member.save를 한번에 하고 싶다면
+  //const member = await Member.create(newMember)이런식으로 작성하면 된다.
   res.send(newMember);
 });
 
-app.put("/api/members/:id", (req, res) => {
+app.put("/api/members/:id", async (req, res) => {
   const { id } = req.params;
   const newInfo = req.body;
-  const member = members.find((m) => m.id === Number(id));
-  if (member) {
-    Object.keys(newInfo).forEach((prop) => {
-      member[prop] = newInfo[prop];
-    });
-    res.send(member);
+  //update메소드가 리턴하는 promise객체에는 작업성공결과로 배열 하나가 들어 있고
+  //그 배열의 첫번째 요소에는 새로 추가된 row가 들어 있다.
+  const result = await Member.update(newInfo, { where: { id } });
+  if (result[0]) {
+    res.send({ message: `${result[0]} row(s) affected` });
   } else {
-    res.status(404).send({ message: "There is no member with the id" });
+    res.status(404).send({ message: "There is no member with the id!" });
   }
 });
+
+/*
+app.put(()=>{
+  const {id} = req.query;
+  const newInfo = req.body;
+  const member = await Member.findOne({where:{id}});
+  if(member) {
+    Object.keys(member).forEach((prop)=>{
+      member[prop] = newInfo[prop];
+    });
+    await member.save();
+    res.send(member);
+  } else {
+    res.status(404).send({message:'There is no member with the id!'})
+  }
+});
+*/
 
 app.delete("/api/members/:id", (req, res) => {
   const { id } = req.params;
