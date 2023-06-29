@@ -84,6 +84,7 @@ app.put("/api/members/:id", async (req, res) => {
 app.put(()=>{
   const {id} = req.query;
   const newInfo = req.body;
+  //member모델 객체는 해당 row와 연동되어 있음
   const member = await Member.findOne({where:{id}});
   if(member) {
     Object.keys(member).forEach((prop)=>{
@@ -97,12 +98,11 @@ app.put(()=>{
 });
 */
 
-app.delete("/api/members/:id", (req, res) => {
+app.delete("/api/members/:id", async (req, res) => {
   const { id } = req.params;
-  const membersCount = members.length;
-  members = members.filter((member) => member.id !== Number(id));
-  if (membersCount > members.length) {
-    res.send({ message: "Deleted" });
+  const deletedCount = await Member.destroy({ where: { id } });
+  if (deletedCount) {
+    res.send({ message: `${deletedCount} row(s) deleted` });
   } else {
     res.status(404).send({ message: "There is no member with the id" });
   }
